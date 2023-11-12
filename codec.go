@@ -499,16 +499,16 @@ func constructEmbeddedStructPointerDecodeFunc(t reflect.Type, unexported bool, o
 	}
 }
 
-func appendStructFields(fields []structField, t reflect.Type, offset uintptr, seen map[reflect.Type]*structType, canAddr bool) []structField {
-	type embeddedField struct {
-		index      int
-		offset     uintptr
-		pointer    bool
-		unexported bool
-		subtype    *structType
-		subfield   *structField
-	}
+type embeddedField struct {
+	index      int
+	offset     uintptr
+	pointer    bool
+	unexported bool
+	subtype    *structType
+	subfield   *structField
+}
 
+func appendStructFields(fields []structField, t reflect.Type, offset uintptr, seen map[reflect.Type]*structType, canAddr bool) []structField {
 	names := make(map[string]struct{})
 	embedded := make([]embeddedField, 0, 10)
 
@@ -607,22 +607,7 @@ func appendStructFields(fields []structField, t reflect.Type, offset uintptr, se
 	}
 
 	// Only unambiguous embedded fields must be serialized.
-	ambiguousNames := make(map[string]int)
-	ambiguousTags := make(map[string]int)
-
-	// Embedded types can never override a field that was already present at
-	// the top-level.
-	for name := range names {
-		ambiguousNames[name]++
-		ambiguousTags[name]++
-	}
-
-	for _, embfield := range embedded {
-		ambiguousNames[embfield.subfield.name]++
-		if embfield.subfield.tag {
-			ambiguousTags[embfield.subfield.name]++
-		}
-	}
+	ambiguousNames, ambiguousTags := ambiguousNameTagCnt(names, embedded)
 
 	for _, embfield := range embedded {
 		subfield := *embfield.subfield
@@ -655,6 +640,27 @@ func appendStructFields(fields []structField, t reflect.Type, offset uintptr, se
 
 	sort.Slice(fields, func(i, j int) bool { return fields[i].index < fields[j].index })
 	return fields
+}
+
+func ambiguousNameTagCnt(names map[string]struct{}, embedded []embeddedField) (map[string]int, map[string]int) {
+	ambiguousNames := make(map[string]int)
+	ambiguousTags := make(map[string]int)
+
+	// Embedded types can never override a field that was already present at
+	// the top-level.
+	for name := range names {
+		ambiguousNames[name]++
+		ambiguousTags[name]++
+	}
+
+	for _, embfield := range embedded {
+		ambiguousNames[embfield.subfield.name]++
+		if embfield.subfield.tag {
+			ambiguousTags[embfield.subfield.name]++
+		}
+	}
+
+	return ambiguousNames, ambiguousTags
 }
 
 func stringify(f *reflect.StructField, c codec) codec {
