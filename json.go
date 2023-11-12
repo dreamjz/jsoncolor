@@ -287,7 +287,7 @@ func (dec *Decoder) readValue() (v []byte, err error) {
 			if err == nil {
 				dec.remain, n = skipSpacesN(r)
 				dec.inputOffset += int64(len(v) + n)
-				return v, err
+				return v, nil
 			}
 			if len(r) != 0 {
 				// Parsing of the next JSON value stopped at a position other

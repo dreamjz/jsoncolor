@@ -300,7 +300,7 @@ func parseNumber(b []byte) (v, r []byte, err error) {
 		i++
 		if i == len(b) || (b[i] != '.' && b[i] != 'e' && b[i] != 'E') {
 			v, r = b[:i], b[i:]
-			return
+			return v, r, err
 		}
 		if '0' <= b[i] && b[i] <= '9' {
 			r, err = b[i:], syntaxError(b, "cannot decode number with leading '0' character")
