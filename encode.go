@@ -757,7 +757,7 @@ type rollback struct{}
 
 func (rollback) Error() string { return "rollback" }
 
-func (e encoder) encodeEmbeddedStructPointer(b []byte, p unsafe.Pointer, _ reflect.Type, unexported bool, offset uintptr, encode encodeFunc) ([]byte, error) {
+func (e encoder) encodeEmbeddedStructPointer(b []byte, p unsafe.Pointer, _ reflect.Type, _ bool, offset uintptr, encode encodeFunc) ([]byte, error) {
 	p = *(*unsafe.Pointer)(p)
 	if p == nil {
 		return b, rollback{}
