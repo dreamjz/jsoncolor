@@ -917,7 +917,7 @@ type structType struct {
 	fieldsIndex map[string]*structField
 	ficaseIndex map[string]*structField
 	typ         reflect.Type
-	inlined     bool
+	// inlined     bool // inlined is unused
 }
 
 type structField struct {
@@ -1068,7 +1068,7 @@ var (
 //
 // The function copies the implementation of time.Duration.String but prevents
 // Go from making a dynamic memory allocation on the returned value.
-func appendDuration(b []byte, d time.Duration) []byte {
+func appendDuration(b []byte, d time.Duration) []byte { //nolint:unused
 	// Largest time is 2540400h10m10.000000000s
 	var buf [32]byte
 	w := len(buf)
@@ -1145,7 +1145,7 @@ func appendDuration(b []byte, d time.Duration) []byte {
 // tail of buf, omitting trailing zeros.  it omits the decimal
 // point too when the fraction is 0.  It returns the index where the
 // output bytes begin and the value v/10**prec.
-func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) {
+func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) { //nolint:unused
 	// Omit trailing zeros up to and including decimal point.
 	w := len(buf)
 	print := false
@@ -1167,7 +1167,7 @@ func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) {
 
 // fmtInt formats v into the tail of buf.
 // It returns the index where the output begins.
-func fmtInt(buf []byte, v uint64) int {
+func fmtInt(buf []byte, v uint64) int { //nolint:unused
 	w := len(buf)
 	if v == 0 {
 		w--
