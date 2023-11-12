@@ -692,7 +692,7 @@ func (e encoder) encodeStruct(b []byte, p unsafe.Pointer, st *structType) ([]byt
 	var k string
 	var n int
 	start := len(b)
-	
+
 	b = e.clrs.appendPunc(b, '{')
 
 	if len(st.fields) > 0 {
