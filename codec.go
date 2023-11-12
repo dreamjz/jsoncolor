@@ -3,6 +3,7 @@ package jsoncolor
 import (
 	"encoding"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -984,7 +985,8 @@ func objectKeyError(b []byte, err error) ([]byte, error) {
 	if len(b) == 0 {
 		return nil, unexpectedEOF(b)
 	}
-	if _, ok := err.(*UnmarshalTypeError); ok {
+	var e *UnmarshalTypeError
+	if errors.As(err, &e) {
 		err = syntaxError(b, "invalid character '%c' looking for beginning of object key", b[0])
 	}
 	return b, err
@@ -1148,17 +1150,17 @@ func appendDuration(b []byte, d time.Duration) []byte { //nolint:unused
 func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) { //nolint:unused
 	// Omit trailing zeros up to and including decimal point.
 	w := len(buf)
-	print := false
+	printEnabled := false
 	for i := 0; i < prec; i++ {
 		digit := v % 10
-		print = print || digit != 0
-		if print {
+		printEnabled = printEnabled || digit != 0
+		if printEnabled {
 			w--
 			buf[w] = byte(digit) + '0'
 		}
 		v /= 10
 	}
-	if print {
+	if printEnabled {
 		w--
 		buf[w] = '.'
 	}
