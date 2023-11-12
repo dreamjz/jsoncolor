@@ -984,8 +984,7 @@ func objectKeyError(b []byte, err error) ([]byte, error) {
 	if len(b) == 0 {
 		return nil, unexpectedEOF(b)
 	}
-	switch err.(type) {
-	case *UnmarshalTypeError:
+	if _, ok := err.(*UnmarshalTypeError); ok {
 		err = syntaxError(b, "invalid character '%c' looking for beginning of object key", b[0])
 	}
 	return b, err
