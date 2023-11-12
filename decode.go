@@ -452,10 +452,6 @@ func (d decoder) decodeDuration(b []byte, p unsafe.Pointer) ([]byte, error) {
 			return inputError(b, int32Type)
 		}
 
-		if v < math.MinInt64 || v > math.MaxInt64 {
-			return r, unmarshalOverflow(b[:len(b)-len(r)], int32Type)
-		}
-
 		*(*time.Duration)(p) = time.Duration(v)
 		return r, nil
 	}
@@ -878,11 +874,12 @@ func (d decoder) decodeMapStringRawMessage(b []byte, p unsafe.Pointer) ([]byte, 
 
 		b, err = d.decodeRawMessage(b, unsafe.Pointer(&val))
 		if err != nil {
-			if _, r, err2 := parseValue(input); err2 != nil {
+			_, r, err2 := parseValue(input)
+			if err2 != nil {
 				return r, err2
-			} else {
-				b = r
 			}
+			b = r
+
 			var e *UnmarshalTypeError
 			if errors.As(err, &e) {
 				e.Struct = mapStringRawMessageType.String() + e.Struct
@@ -969,11 +966,12 @@ func (d decoder) decodeStruct(b []byte, p unsafe.Pointer, st *structType) ([]byt
 		}
 
 		if b, err = f.codec.decode(d, b, unsafe.Pointer(uintptr(p)+f.offset)); err != nil {
-			if _, r, err2 := parseValue(input); err2 != nil {
+			_, r, err2 := parseValue(input)
+			if err2 != nil {
 				return r, err2
-			} else {
-				b = r
 			}
+			b = r
+
 			var e *UnmarshalTypeError
 			if errors.As(err, &e) {
 				e.Struct = st.typ.String() + e.Struct
