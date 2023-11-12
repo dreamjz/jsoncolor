@@ -398,7 +398,7 @@ func (enc *Encoder) Encode(v interface{}) error {
 	}
 
 	var err error
-	var buf = encoderBufferPool.Get().(*encoderBuffer)
+	var buf = encoderBufferPool.Get().(*encoderBuffer) //nolint:errcheck
 
 	// Note: unlike the original segmentio encoder, indentation is
 	// performed via the Append function.

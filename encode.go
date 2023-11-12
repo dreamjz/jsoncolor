@@ -631,7 +631,7 @@ func (e encoder) encodeMapStringRawMessage(b []byte, p unsafe.Pointer) ([]byte, 
 		return b, nil
 	}
 
-	s := mapslicePool.Get().(*mapslice)
+	s := mapslicePool.Get().(*mapslice) //nolint:errcheck
 	if cap(s.elements) < len(m) {
 		s.elements = make([]element, 0, align(10, uintptr(len(m))))
 	}
@@ -649,7 +649,7 @@ func (e encoder) encodeMapStringRawMessage(b []byte, p unsafe.Pointer) ([]byte, 
 
 		e.indentr.push()
 
-		for i, elem := range s.elements {
+		for i := range s.elements {
 			if i != 0 {
 				b = e.clrs.appendPunc(b, ',')
 				b = e.indentr.appendByte(b, '\n')
@@ -657,6 +657,7 @@ func (e encoder) encodeMapStringRawMessage(b []byte, p unsafe.Pointer) ([]byte, 
 
 			b = e.indentr.appendIndent(b)
 
+			elem := s.elements[i]
 			b, _ = e.encodeKey(b, unsafe.Pointer(&elem.key))
 			b = e.clrs.appendPunc(b, ':')
 			b = e.indentr.appendByte(b, ' ')
