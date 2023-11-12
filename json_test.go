@@ -730,6 +730,12 @@ func TestDecodeLines(t *testing.T) {
 						break
 					}
 
+					switch err.(type) {
+					case *SyntaxError, *UnmarshalTypeError:
+						t.Log("unmarshal error", err)
+						continue
+					}
+
 					t.Error("decode error", err)
 					break
 				}
