@@ -584,7 +584,7 @@ func appendStructFields(fields []structField, t reflect.Type, offset uintptr, se
 			}
 		}
 
-		codec := constructCodec(f.Type, seen, canAddr)
+		c := constructCodec(f.Type, seen, canAddr)
 
 		if stringify {
 			// https://golang.org/pkg/encoding/json/#Marshal
@@ -612,19 +612,19 @@ func appendStructFields(fields []structField, t reflect.Type, offset uintptr, se
 				reflect.Uint16,
 				reflect.Uint32,
 				reflect.Uint64:
-				codec.encode = constructStringEncodeFunc(codec.encode)
-				codec.decode = constructStringToIntDecodeFunc(typ, codec.decode)
+				c.encode = constructStringEncodeFunc(c.encode)
+				c.decode = constructStringToIntDecodeFunc(typ, c.decode)
 			case reflect.Bool,
 				reflect.Float32,
 				reflect.Float64,
 				reflect.String:
-				codec.encode = constructStringEncodeFunc(codec.encode)
-				codec.decode = constructStringDecodeFunc(codec.decode)
+				c.encode = constructStringEncodeFunc(c.encode)
+				c.decode = constructStringDecodeFunc(c.decode)
 			}
 		}
 
 		fields = append(fields, structField{
-			codec:     codec,
+			codec:     c,
 			offset:    offset + f.Offset,
 			empty:     emptyFuncOf(f.Type),
 			tag:       tag,
@@ -917,7 +917,7 @@ type structType struct {
 	fieldsIndex map[string]*structField
 	ficaseIndex map[string]*structField
 	typ         reflect.Type
-	inlined     bool
+	// inlined     bool // inlined is unused
 }
 
 type structField struct {
@@ -984,8 +984,7 @@ func objectKeyError(b []byte, err error) ([]byte, error) {
 	if len(b) == 0 {
 		return nil, unexpectedEOF(b)
 	}
-	switch err.(type) {
-	case *UnmarshalTypeError:
+	if _, ok := err.(*UnmarshalTypeError); ok {
 		err = syntaxError(b, "invalid character '%c' looking for beginning of object key", b[0])
 	}
 	return b, err
@@ -1010,7 +1009,7 @@ func uintStringsAreSorted(u0, u1 uint64) bool {
 
 //go:nosplit
 func stringToBytes(s string) []byte {
-	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{ // nolint:govet // from segment's code
+	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{ //nolint:govet // from segment's code
 		Data: ((*reflect.StringHeader)(unsafe.Pointer(&s))).Data,
 		Len:  len(s),
 		Cap:  len(s),
@@ -1069,7 +1068,7 @@ var (
 //
 // The function copies the implementation of time.Duration.String but prevents
 // Go from making a dynamic memory allocation on the returned value.
-func appendDuration(b []byte, d time.Duration) []byte {
+func appendDuration(b []byte, d time.Duration) []byte { //nolint:unused
 	// Largest time is 2540400h10m10.000000000s
 	var buf [32]byte
 	w := len(buf)
@@ -1146,7 +1145,7 @@ func appendDuration(b []byte, d time.Duration) []byte {
 // tail of buf, omitting trailing zeros.  it omits the decimal
 // point too when the fraction is 0.  It returns the index where the
 // output bytes begin and the value v/10**prec.
-func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) {
+func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) { //nolint:unused
 	// Omit trailing zeros up to and including decimal point.
 	w := len(buf)
 	print := false
@@ -1168,7 +1167,7 @@ func fmtFrac(buf []byte, v uint64, prec int) (nw int, nv uint64) {
 
 // fmtInt formats v into the tail of buf.
 // It returns the index where the output begins.
-func fmtInt(buf []byte, v uint64) int {
+func fmtInt(buf []byte, v uint64) int { //nolint:unused
 	w := len(buf)
 	if v == 0 {
 		w--
