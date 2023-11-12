@@ -718,7 +718,8 @@ func (d decoder) decodeMap(b []byte, p unsafe.Pointer, t, kt, vt reflect.Type, k
 			} else {
 				b = r
 			}
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = "map[" + kt.String() + "]" + vt.String() + "{" + e.Struct + "}"
 				e.Field = fmt.Sprint(k.Interface()) + "." + e.Field
 			}
@@ -799,7 +800,8 @@ func (d decoder) decodeMapStringInterface(b []byte, p unsafe.Pointer) ([]byte, e
 			} else {
 				b = r
 			}
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = mapStringInterfaceType.String() + e.Struct
 				e.Field = key + "." + e.Field
 			}
@@ -880,7 +882,8 @@ func (d decoder) decodeMapStringRawMessage(b []byte, p unsafe.Pointer) ([]byte, 
 			} else {
 				b = r
 			}
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = mapStringRawMessageType.String() + e.Struct
 				e.Field = key + "." + e.Field
 			}
