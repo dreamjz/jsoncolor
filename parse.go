@@ -544,9 +544,9 @@ func parseObject(b []byte) ([]byte, []byte, error) {
 	}
 
 	var err error
-	var a = b
-	var n = len(b)
-	var i = 0
+	a := b
+	n := len(b)
+	i := 0
 
 	b = b[1:]
 	for {
@@ -610,9 +610,9 @@ func parseArray(b []byte) ([]byte, []byte, error) {
 	}
 
 	var err error
-	var a = b
-	var n = len(b)
-	var i = 0
+	a := b
+	n := len(b)
+	i := 0
 
 	b = b[1:]
 	for {
