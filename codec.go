@@ -918,7 +918,7 @@ type structType struct {
 	fieldsIndex map[string]*structField
 	ficaseIndex map[string]*structField
 	typ         reflect.Type
-	// inlined     bool // inlined is unused
+	inlined     bool //nolint:unused
 }
 
 type structField struct {

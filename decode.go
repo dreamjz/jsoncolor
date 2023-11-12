@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-func (d decoder) decodeNull(b []byte, p unsafe.Pointer) ([]byte, error) {
+func (d decoder) decodeNull(b []byte, _ unsafe.Pointer) ([]byte, error) {
 	if hasNullPrefix(b) {
 		return b[4:], nil
 	}
