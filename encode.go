@@ -115,7 +115,7 @@ func (e encoder) encodeFloat(b []byte, f float64, bits int) ([]byte, error) {
 		}
 	}
 
-	b = strconv.AppendFloat(b, f, fmt, -1, int(bits))
+	b = strconv.AppendFloat(b, f, fmt, -1, bits)
 
 	if fmt == 'e' {
 		// clean up e-09 to e-9
@@ -527,7 +527,7 @@ func (e encoder) encodeMapStringInterface(b []byte, p unsafe.Pointer) ([]byte, e
 		return b, nil
 	}
 
-	s := mapslicePool.Get().(*mapslice)
+	s := mapslicePool.Get().(*mapslice) //nolint:errcheck
 	if cap(s.elements) < len(m) {
 		s.elements = make([]element, 0, align(10, uintptr(len(m))))
 	}
