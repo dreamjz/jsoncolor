@@ -140,9 +140,5 @@ func doMain() error {
 		enc.SetIndent("", "  ")
 	}
 
-	if err = enc.Encode(jsn); err != nil {
-		return err
-	}
-
-	return nil
+	return enc.Encode(jsn)
 }
