@@ -1109,7 +1109,7 @@ func (d decoder) decodeMaybeEmptyInterface(b []byte, p unsafe.Pointer, t reflect
 	return d.decodeUnmarshalTypeError(b, p, t)
 }
 
-func (d decoder) decodeUnmarshalTypeError(b []byte, p unsafe.Pointer, t reflect.Type) ([]byte, error) {
+func (d decoder) decodeUnmarshalTypeError(b []byte, _ unsafe.Pointer, t reflect.Type) ([]byte, error) {
 	v, b, err := parseValue(b)
 	if err != nil {
 		return b, err
