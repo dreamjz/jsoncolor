@@ -5,6 +5,7 @@ import (
 	"encoding"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -278,7 +279,7 @@ func (d decoder) decodeString(b []byte, p unsafe.Pointer) ([]byte, error) {
 		return b[4:], nil
 	}
 
-	s, r, new, err := parseStringUnquote(b, nil)
+	s, r, isNew, err := parseStringUnquote(b, nil)
 	if err != nil {
 		if len(b) == 0 || b[0] != '"' {
 			return inputError(b, stringType)
@@ -286,7 +287,7 @@ func (d decoder) decodeString(b []byte, p unsafe.Pointer) ([]byte, error) {
 		return r, err
 	}
 
-	if new || (d.flags&DontCopyString) != 0 {
+	if isNew || (d.flags&DontCopyString) != 0 {
 		*(*string)(p) = *(*string)(unsafe.Pointer(&s))
 	} else {
 		*(*string)(p) = string(s)
@@ -374,7 +375,8 @@ func (d decoder) decodeFromStringToInt(b []byte, p unsafe.Pointer, t reflect.Typ
 	}
 
 	if r, err := decode(d, v, p); err != nil {
-		if _, isSyntaxError := err.(*SyntaxError); isSyntaxError {
+		var e *SyntaxError
+		if errors.As(err, &e) {
 			if hasPrefix(v, "-") {
 				// The standard library interprets sequences of '-' characters
 				// as numbers but still returns type errors in this case...
@@ -533,7 +535,8 @@ func (d decoder) decodeArray(b []byte, p unsafe.Pointer, n int, size uintptr, t 
 
 		b, err = decode(d, b, unsafe.Pointer(uintptr(p)+(uintptr(i)*size)))
 		if err != nil {
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = t.String() + e.Struct
 				e.Field = strconv.Itoa(i) + "." + e.Field
 			}
@@ -635,7 +638,8 @@ func (d decoder) decodeSlice(b []byte, p unsafe.Pointer, size uintptr, t reflect
 			} else {
 				b = r
 			}
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = t.String() + e.Struct
 				e.Field = strconv.Itoa(s.len) + "." + e.Field
 			}

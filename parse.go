@@ -276,7 +276,7 @@ func parseFalse(b []byte) ([]byte, []byte, error) {
 func parseNumber(b []byte) (v, r []byte, err error) {
 	if len(b) == 0 {
 		r, err = b, unexpectedEOF(b)
-		return
+		return v, r, err
 	}
 
 	i := 0
