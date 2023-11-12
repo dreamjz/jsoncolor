@@ -973,7 +973,8 @@ func (d decoder) decodeStruct(b []byte, p unsafe.Pointer, st *structType) ([]byt
 			} else {
 				b = r
 			}
-			if e, ok := err.(*UnmarshalTypeError); ok {
+			var e *UnmarshalTypeError
+			if errors.As(err, &e) {
 				e.Struct = st.typ.String() + e.Struct
 				e.Field = string(k) + "." + e.Field
 			}
